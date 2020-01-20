@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <div class="item-motion" style="width: 500px; height: 500px; background: purple">
+    HOLA
+  </div>
+  <script>
+
+    "use strict"; function FloatingElement(t) {var i = t.selector, n = t.limits, e = t.motion, o = t.rotation, s = document.querySelector(i); s || console.error("Selecor incorrecto"), s.addEventListener("mousemove", this.mouseListener.bind(this)), this.direction = this.config.directions[this.random(0, 4)], this.limits = n, this.rotation = o, this.motion = e, this.initialMotion = e, this.motionEngine(s)} FloatingElement.prototype.random = function (t, i) {return Math.floor(Math.random() * (i - t + 1) + t)}, FloatingElement.prototype.map = function (t, i, n, e, o) {return (t - i) / (n - i) * (o - e) + e}, FloatingElement.prototype.lerp = function (t, i, n) {return (1 - n) * t + n * i}, FloatingElement.prototype.config = {offsetX: .001, offsetY: .005, directions: ["FORWARDS", "FIXED-X-FORWARDS", "FIXED-Y-FORWARDS", "BACKWARDS", "FIXED-X-BACKWARDS", "FIXED-Y-BACKWARDS"], incrementX: 3e-4, incrementY: 1e-4, amount: 200, mutatedX: 0, mutatedY: 0}, FloatingElement.prototype.nextDirection = function (t, i, n) {var e = this.limits; return t > e[0] && t < e[1] && !n.includes("BACKWARDS") ? "FORWARDS" : t < e[0] && t > e[1] && !n.includes("FORWARDS") ? "BACKWARDS" : t > e[1] && !n.includes("FIXED-X") ? "FIXED-X-BACKWARDS" : i > e[1] && !n.includes("FIXED-Y") ? "FIXED-Y-BACKWARDS" : t < e[0] && !n.includes("FIXED-X") ? "FIXED-X-FORWARDS" : i > e[0] && !n.includes("FIXED-Y") ? "FIXED-Y-FORWARDS" : this.config.directions[this.random(0, 4)]}, FloatingElement.prototype.motionEngine = function (t) {var i = this, n = (this.rotation, this.direction), e = this.config, o = e.incrementX, s = e.incrementY, r = e.amount, c = this.lerp(o, this.config.offsetX, r), f = this.lerp(s, this.config.offsetY, r), a = this.lerp(s + o, this.config.offsetY + this.config.offsetX, 100); switch (t.style.transform = "\n      translate3d(\n        " + (this.config.mutatedX + c) + "%, \n        " + (this.config.mutatedY + f) + "%,\n        0 \n      )\n      rotate(" + (a + this.rotation) + "deg)\n      ", this.motion || (this.direction = this.nextDirection(c, f, n), this.motion = this.initialMotion), n) {case "FORWARDS": this.config.offsetX += o, this.config.offsetY += s; break; case "BACKWARDS": this.config.offsetX -= o, this.config.offsetY -= s; break; case "FIXED-X-BACKWARDS": this.config.offsetX -= o; break; case "FIXED-X-FORWARDS": this.config.offsetX += o; break; case "FIXED-Y-BACKWARDS": this.config.offsetY -= s; break; case "FIXED-Y-FORWARDS": this.config.offsetY += s}this.motion -= 1, window.requestAnimationFrame(function () {return i.motionEngine(t)})}, FloatingElement.prototype.mouseListener = function (t) {var i = t.target, n = t.clientX, e = t.clientY, o = this.limits; if ("IMG" === i.tagName) {var s = i.getBoundingClientRect(), r = s.x, c = s.y, f = s.height, a = s.width; this.config.mutatedX = this.map(n - r, r, r + a, o[0] + 2, o[1] - 2), this.config.mutatedY = this.map(e - c, c, c + f, o[0] + 2, o[1] - 2)} };
+
+
+    const n = new FloatingElement({
+      selector: '.item-motion',
+      limits: [-5, 5],
+      motion: 100,
+      rotation: 0,
+    })
+
+    console.log(n)
+
+  </script>
+</body>
+
+</html>

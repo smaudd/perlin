@@ -1,15 +1,17 @@
 function FloatingElement({ selector, limits, motion, rotation }) {
-  const node = document.querySelector(selector)
-  if (!node) {
+  const nodes = document.querySelectorAll(selector)
+  if (!nodes) {
     console.error('Selecor incorrecto')
   }
-  node.addEventListener('mousemove', this.mouseListener.bind(this))
   this.direction = this.config.directions[this.random(0, 4)]
   this.limits = limits
   this.rotation = rotation
   this.motion = motion
   this.initialMotion = motion
-  this.motionEngine(node)
+  nodes.forEach(node => {
+    node.addEventListener('mousemove', this.mouseListener.bind(this))
+    this.motionEngine(node)
+  })
 }
 
 FloatingElement.prototype.random = function(min, max) {
@@ -78,13 +80,18 @@ FloatingElement.prototype.motionEngine = function(element) {
   const { incrementX, incrementY, amount } = this.config
   const nextX = this.lerp(incrementX, this.config.offsetX, amount)
   const nextY = this.lerp(incrementY, this.config.offsetY, amount)
-  const nextRotation = this.lerp(
-    incrementY + incrementX,
-    this.config.offsetY + this.config.offsetX,
-    100
-  )
+  let nextRotation
 
-  element.style.transform = `
+  if (rotation) {
+    nextRotation = this.lerp(
+      incrementY + incrementX,
+      this.config.offsetY + this.config.offsetX,
+      100
+    )
+  }
+
+  if (nextRotation) {
+    element.style.transform = `
       translate3d(
         ${this.config.mutatedX + nextX}%, 
         ${this.config.mutatedY + nextY}%,
@@ -92,6 +99,16 @@ FloatingElement.prototype.motionEngine = function(element) {
       )
       rotate(${nextRotation + this.rotation}deg)
       `
+  } else {
+    element.style.transform = `
+      translate3d(
+        ${this.config.mutatedX + nextX}%, 
+        ${this.config.mutatedY + nextY}%,
+        0 
+      )
+      `
+  }
+
   if (!this.motion) {
     this.direction = this.nextDirection(nextX, nextY, direction)
     this.motion = this.initialMotion
