@@ -1,4 +1,4 @@
-function FloatingElement({ selector, limits, motion, rotation }) {
+function FloatingElement({ selector, limits, motion, rotation, speed }) {
   const nodes = document.querySelectorAll(selector)
   if (!nodes) {
     console.error('Selecor incorrecto')
@@ -8,6 +8,7 @@ function FloatingElement({ selector, limits, motion, rotation }) {
   this.rotation = rotation
   this.motion = motion
   this.initialMotion = motion
+  this.speed = speed
   nodes.forEach(node => {
     node.addEventListener('mousemove', this.mouseListener.bind(this))
     this.motionEngine(node)
@@ -138,8 +139,12 @@ FloatingElement.prototype.motionEngine = function(element) {
     default:
       break
   }
-  this.motion -= 1
-  window.requestAnimationFrame(() => this.motionEngine(element))
+  this.motion -= this.speed
+  window.requestAnimationFrame(() => {
+    setTimeout(() => {
+      this.motionEngine(element)
+    }, 20);
+  })
 }
 
 FloatingElement.prototype.mouseListener = function({
@@ -148,22 +153,57 @@ FloatingElement.prototype.mouseListener = function({
   clientY
 }) {
   const { limits } = this
+  const { width, height, x, y } = target.getBoundingClientRect()
+  const isOnXMinLimit = () => this.config.mutatedX > this.limits[0]
+  const isOnXMaxLimit = () => this.config.mutatedX < this.limits[1]
+  const isOnYMinLimit = () => this.config.mutatedY > this.limits[0]
+  const isOnYMaxLimit = () => this.config.mutatedY < this.limits[1]
+
   if (target.tagName === 'IMG') {
-    const { x, y, height, width } = target.getBoundingClientRect()
-    this.config.mutatedX = this.map(
-      clientX - x,
-      x,
-      x + width,
-      limits[0] + 2,
-      limits[1] - 2
-    )
-    this.config.mutatedY = this.map(
-      clientY - y,
-      y,
-      y + height,
-      limits[0] + 2,
-      limits[1] - 2
-    )
+    // Left
+    if (clientX - x < width / 2 && isOnXMinLimit()) {
+      this.config.mutatedX = this.map(
+        clientX - x,
+        x,
+        x + width,
+        1,
+        3
+      )
+    }
+
+    // Right
+    if (clientX - x > width / 2 && isOnXMaxLimit()) {
+      this.config.mutatedX = this.map(
+        clientX - x,
+        x,
+        x + width,
+        1,
+        3
+      )
+    }
+
+    // Top
+    if (clientY - y < height / 2 && isOnYMinLimit()) {
+      this.config.mutatedY = this.map(
+        clientY - y,
+        y,
+        y + height,
+        1,
+        3
+      )
+
+    }
+
+    // Bottom
+    if (clientY - y > height / 2 && isOnYMaxLimit()) {
+      this.config.mutatedY = this.map(
+        clientY - y,
+        y,
+        y + height,
+        1,
+        3
+      )
+    }
   }
 }
 
