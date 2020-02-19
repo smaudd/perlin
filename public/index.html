@@ -13,7 +13,7 @@
     width: 100vh;
     height: 100vh;
     display: flex;
-    align-items: center;
+    /* align-items: center; */
     justify-content: center;
   }
 
@@ -29,14 +29,22 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 1px solid red;
     /* background: red; */
+  }
+
+  .item-motion {
+    width: 100px;
+    height: 100px;
+    background: purple;
   }
 </style>
 
 
 <body>
   <div class="container">
-    <img class="item-motion" src="assets/flowers.png"></img>
+    <div class="item-motion"></div>
+    <!-- <img class="item-motion" src="assets/flowers.png"></img> -->
   </div>
   <script src="bundle.js"></script>
 </body>

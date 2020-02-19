@@ -19,8 +19,12 @@ FloatingElement.prototype.random = function(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
-FloatingElement.prototype.map = function(value, start1, stop1, start2, stop2) {
-  return (value - start1) / (stop1 - start1) * (stop2 - start2) + start2
+// FloatingElement.prototype.map = function(value, start1, stop1, start2, stop2) {
+//   return (value - start1) / (stop1 - start1) * (stop2 - start2) + start2
+// }
+
+FloatingElement.prototype.map = function(n, start1, stop1, start2, stop2) {
+  return (n - start1) / (stop1 - start1) * (stop2 - start2) + start2;
 }
 
 FloatingElement.prototype.lerp = function(start, end, amt) {
@@ -140,11 +144,7 @@ FloatingElement.prototype.motionEngine = function(element) {
       break
   }
   this.motion -= this.speed
-  window.requestAnimationFrame(() => {
-    setTimeout(() => {
-      this.motionEngine(element)
-    }, 20);
-  })
+  window.requestAnimationFrame(() => this.motionEngine(element))
 }
 
 FloatingElement.prototype.mouseListener = function({
@@ -154,56 +154,38 @@ FloatingElement.prototype.mouseListener = function({
 }) {
   const { limits } = this
   const { width, height, x, y } = target.getBoundingClientRect()
-  const isOnXMinLimit = () => this.config.mutatedX > this.limits[0]
-  const isOnXMaxLimit = () => this.config.mutatedX < this.limits[1]
-  const isOnYMinLimit = () => this.config.mutatedY > this.limits[0]
-  const isOnYMaxLimit = () => this.config.mutatedY < this.limits[1]
-
-  if (target.tagName === 'IMG') {
-    // Left
-    if (clientX - x < width / 2 && isOnXMinLimit()) {
-      this.config.mutatedX = this.map(
-        clientX - x,
-        x,
-        x + width,
-        1,
-        3
-      )
+  if (target.className.includes('item-motion')) {
+    const mutatedY = this.map(clientY, y, y + height, limits[0], limits[1])
+    const mutatedX = this.map(clientX, x, x + width, limits[0], limits[1])
+    
+    const mutateX = () => {
+      if (this.config.mutatedX < mutatedX) {
+        this.config.mutatedX += 0.3
+        window.requestAnimationFrame(() => mutateX)
+        console.log('LoopX')
+      }
+      if (this.config.mutatedX > mutatedX) {
+        this.config.mutatedX -= 0.3
+        window.requestAnimationFrame(() => mutateX)
+        console.log('LoopXB')
+      }
     }
+    mutateX()
 
-    // Right
-    if (clientX - x > width / 2 && isOnXMaxLimit()) {
-      this.config.mutatedX = this.map(
-        clientX - x,
-        x,
-        x + width,
-        1,
-        3
-      )
+    const mutateY = () => {
+      if (this.config.mutatedY < mutatedY) {
+        this.config.mutatedY += 0.3
+        window.requestAnimationFrame(() => mutateY)
+        console.log('LoopY')
+      }
+      if (this.config.mutatedY > mutatedY) {
+        this.config.mutatedY -= 0.3
+        window.requestAnimationFrame(() => mutateY)
+        console.log('LoopYB')
+      }
     }
+    mutateY()
 
-    // Top
-    if (clientY - y < height / 2 && isOnYMinLimit()) {
-      this.config.mutatedY = this.map(
-        clientY - y,
-        y,
-        y + height,
-        1,
-        3
-      )
-
-    }
-
-    // Bottom
-    if (clientY - y > height / 2 && isOnYMaxLimit()) {
-      this.config.mutatedY = this.map(
-        clientY - y,
-        y,
-        y + height,
-        1,
-        3
-      )
-    }
   }
 }
 
